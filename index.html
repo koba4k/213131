@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#12141c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dashboard">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link rel="icon" href="data:image/png;base64,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">
+<title>Dashboard</title>
+<style>
+:root{
+  --bg:#12141c; --side:#171a24; --card:#1d212d; --card-h:#232837; --line:#2a3040;
+  --text:#eef0f6; --mute:#8b93a7; --accent:#7084ff; --accent-bg:rgba(112,132,255,.14);
+  --up:#2ed3a0; --down:#ff6b7a; --warn:#f5b84b;
+  --font:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font:14px/1.45 var(--font);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+.app{display:grid;grid-template-columns:232px 1fr;min-height:100%}
+.sidebar{position:sticky;top:0;height:100vh;background:var(--side);border-right:1px solid var(--line);padding:20px 12px;display:flex;flex-direction:column;gap:24px}
+.brand{display:flex;align-items:center;gap:10px;padding:0 10px;font-weight:650;font-size:16px;letter-spacing:-.01em}
+.brand i{width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#7084ff,#9b6bff)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;color:var(--mute);text-align:left;transition:background .15s,color .15s}
+.nav button:hover{background:var(--card);color:var(--text)}
+.nav button.active{background:var(--accent-bg);color:var(--accent)}
+.nav .soon{margin-left:auto;font-size:11px;color:var(--mute);border:1px solid var(--line);border-radius:6px;padding:0 6px}
+
+.main{padding:calc(32px + env(safe-area-inset-top,0px)) clamp(16px,4vw,48px) 48px;min-width:0}
+.page{max-width:720px;margin:0 auto}
+.head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+h1{font-size:22px;font-weight:650;letter-spacing:-.02em}
+
+.total{background:linear-gradient(160deg,#242a3d,#1d212d);border:1px solid var(--line);border-radius:18px;padding:22px 24px;margin-bottom:16px}
+.total small{color:var(--mute)}
+.total .sum{font-size:clamp(30px,6vw,40px);font-weight:700;letter-spacing:-.03em;margin:4px 0 6px;font-variant-numeric:tabular-nums}
+.total .row{display:flex;gap:16px;flex-wrap:wrap;color:var(--mute)}
+
+.bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;background:var(--card);border:1px solid var(--line);transition:background .15s}
+.btn:hover{background:var(--card-h)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:550}
+.btn.primary:hover{background:#8394ff}
+.btn[disabled]{opacity:.6;cursor:default}
+.btn svg{width:16px;height:16px}
+.spin svg{animation:rot .8s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.upd{margin-left:auto;color:var(--mute);font-size:12px}
+
+.banner{background:rgba(255,107,122,.1);border:1px solid rgba(255,107,122,.35);color:#ffb0b8;border-radius:12px;padding:10px 14px;margin-bottom:12px}
+
+.list{display:flex;flex-direction:column;gap:8px}
+.w{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid transparent;border-radius:16px;padding:14px 16px;transition:background .15s,border-color .15s}
+.w:hover{background:var(--card-h);border-color:var(--line)}
+.av{width:42px;height:42px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:700;font-size:13px;color:rgba(255,255,255,.92);text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.info{min-width:0;flex:1}
+.name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.addr{display:inline-flex;align-items:center;gap:6px;color:var(--mute);font-size:12.5px;font-variant-numeric:tabular-nums;padding:1px 0;border-radius:6px}
+.addr:hover{color:var(--text)}
+.addr svg{width:13px;height:13px}
+.val{text-align:right;font-variant-numeric:tabular-nums}
+.bal{font-size:18px;font-weight:650;letter-spacing:-.01em}
+.chg{font-size:12.5px;font-weight:550}
+.up{color:var(--up)}.down{color:var(--down)}.flat{color:var(--mute)}
+.err{color:var(--warn);font-size:12.5px;text-align:right}
+.err button{color:var(--accent);margin-left:6px;text-decoration:underline}
+.sk{display:block;height:12px;border-radius:6px;background:linear-gradient(90deg,var(--line),#343b50,var(--line));background-size:200% 100%;animation:sh 1.2s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+
+.stub{text-align:center;padding:80px 20px;color:var(--mute)}
+.stub svg{width:40px;height:40px;margin-bottom:12px;opacity:.6}
+.stub h2{color:var(--text);font-size:18px;margin-bottom:6px}
+
+@media(max-width:760px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:fixed;inset:auto 0 0 0;height:auto;z-index:10;flex-direction:row;border-right:0;border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+  .brand{display:none}
+  .nav{flex-direction:row;flex:1;justify-content:space-around;overflow-x:auto}
+  .nav button{flex-direction:column;gap:2px;font-size:11px;padding:6px 10px}
+  .nav .soon{display:none}
+  .main{padding:calc(20px + env(safe-area-inset-top,0px)) 14px calc(96px + env(safe-area-inset-bottom,0px))}
+  .upd{width:100%;margin:0}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><i></i>Dashboard</div>
+    <nav class="nav" id="nav" aria-label="Разделы"></nav>
+  </aside>
+  <main class="main"><div class="page" id="view"></div></main>
+</div>
+
+<script>
+/* ============ Настройки ============ */
+// Кошельки: строка-адрес или { address, name }. Без имени будет «Wallet N».
+const WALLETS = [
+  "0x46e2a49e5424350EA7F25897b4b8F10fE96456e0",
+  "0xd633b379eBCa6822E43882732C3A8fb906e001c3",
+  "0x79C2d9e9b27b93d32659d703453443760Fdcc9A2",
+  "0x0aEE87C97364F23Cd3d278Fb51692eb71e6E8181",
+  "0xfBc69cC1F1B7cF538BdF0E675fCaD06ff3311BcE",
+  "0x0Bf24432336110A3586036Af7b22ae8dcF29494C",
+  "0xd8375eB389a0c5F8306A6aF2f50B3f4226ffC99e",
+  "0x784Ec34E3494D1755725769022b91c32D12E08CD",
+  "0x20ee21a87E907c490B6742204Dd3a45450024284",
+  "0xAa513f0a33A056E21E81D9CF67c4781f4D00c990",
+  "0x4E73fbd1f5dF3e67F7DBd0A3618AA5be967B1f4d",
+  "0xDE27eFdd782b6eCcB45cfc6ce429cB073E60375F",
+  "0xD766A9DF477d22666db119CA46646f3d1eB99Bb2",
+  "0x9224e79c785Fa4b8d090bc5099d5ea3eB29Ff901",
+  "0x78bbf482298a851Ca06Acda990ff2F48421aD0F7",
+  "0x21879Aa08853F0daDd5cd5781F3D7CefFE84BD71",
+  "0xa5a2876Cb662CFA1620F56e885b53cC864602e3b",
+  "0xD45C283911Ac1af93A82FB5aF6fb8bF364c90524",
+  "0x95ab8cfa646b4696aF2f6D859E0a3952dcA0FaC9",
+  "0xd4044dd3cED3299170fa251Fd32cA9c95054Dc80",
+  "0xa7338ceEBF32714Fe279De238F21a0927E619CB7",
+  "0xE0D5A75b9D203E242aD29864a2Ee22375dC054A9",
+  "0x83C3807606234Ca17Ee6050d074ac75fEe9f1eA1",
+  "0xB33aBDb6B7BBe912630339A18c99702C50Da93dE",
+  "0x9ACBE2dA9356e3c1f613b0bd05cC26F54c8322Ee",
+  "0xe98614605FBe131451DE220fbA3a0401EAB297b5",
+  "0x3EB6063daBA0627d5870B533f813c8877D933D79",
+  "0xfff9AFE23d6E3577Cb863751DE8d22795f76C172",
+  "0x52789fB0efe2b6721267e7308AB2d61A30f65b60",
+];
+const API = "https://api.hyperliquid.xyz/info";
+const CONCURRENCY = 5;
+
+/* ============ Утилиты ============ */
+const $ = (s, r = document) => r.querySelector(s);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+const fmtUsd = n => usd.format(n);
+const short = a => a.slice(0, 6) + "…" + a.slice(-4);
+const ico = {
+  wallet: '<svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h12v4"/><path d="M3 7v10a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"/><path d="M21 9H7a2 2 0 0 0 0 4h14z"/></svg>',
+  chart: '<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+  globe: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>',
+  refresh: '<svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>',
+  sort: '<svg viewBox="0 0 24 24"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/></svg>',
+  copy: '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>',
+  clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+};
+
+function avatar(addr) {
+  const h = parseInt(addr.slice(2, 10), 16), h2 = parseInt(addr.slice(10, 18), 16);
+  const a = h % 360, b = (a + 40 + (h2 % 120)) % 360;
+  return `<div class="av" style="background:linear-gradient(${h2 % 360}deg,hsl(${a} 70% 55%),hsl(${b} 75% 45%))">${addr.slice(2, 4).toUpperCase()}</div>`;
+}
+
+/* ============ Hyperliquid API ============ */
+async function post(body, tries = 3) {
+  for (let i = 0; i < tries; i++) {
+    try {
+      const r = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      if (r.status === 429) { await sleep(900 * (i + 1)); continue; }
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return await r.json();
+    } catch (e) {
+      if (i === tries - 1) throw e;
+      await sleep(400 * (i + 1));
+    }
+  }
+  throw new Error("Лимит запросов API");
+}
+
+async function fetchWallet(address) {
+  const [st, pf] = await Promise.allSettled([
+    post({ type: "clearinghouseState", user: address }),
+    post({ type: "portfolio", user: address }),
+  ]);
+  if (st.status === "rejected") throw st.reason;
+  let value = parseFloat(st.value?.marginSummary?.accountValue);
+  let diff = null, pct = null;
+  if (pf.status === "fulfilled") {
+    const day = (pf.value || []).find(p => p[0] === "day")?.[1];
+    const av = day?.accountValueHistory, pnl = day?.pnlHistory;
+    if (av?.length) {
+      const start = +av[0][1], end = +av[av.length - 1][1];
+      if (isNaN(value)) value = end;
+      // PnL-разница не учитывает вводы/выводы; если её нет — берём изменение баланса
+      diff = pnl?.length > 1 ? +pnl[pnl.length - 1][1] - +pnl[0][1] : end - start;
+      pct = start > 0 ? diff / start * 100 : null;
+    }
+  }
+  if (isNaN(value)) throw new Error("Нет данных");
+  return { value, diff, pct };
+}
+
+/* ============ Модуль «Wallets» ============ */
+const Wallets = (() => {
+  const items = WALLETS.map((w, i) => {
+    const o = typeof w === "string" ? { address: w } : w;
+    return { address: o.address, name: o.name || "Wallet " + (i + 1), idx: i, status: "idle" };
+  });
+  let sort = "desc", loading = false, updated = null, root = null, raf = 0;
+
+  async function loadOne(it) {
+    it.status = "loading"; paint();
+    try { Object.assign(it, await fetchWallet(it.address), { status: "ok", error: null }); }
+    catch (e) { it.status = "error"; it.error = e.message || "Ошибка"; }
+    paint();
+  }
+  async function refresh() {
+    if (loading) return;
+    loading = true; items.forEach(i => { if (i.status !== "ok") i.status = "loading"; });
+    paint();
+    const queue = items.slice();
+    await Promise.all(Array.from({ length: CONCURRENCY }, async () => {
+      while (queue.length) await loadOne(queue.shift());
+    }));
+    loading = false; updated = new Date(); paint();
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && root?.isConnected && updated && Date.now() - updated > 60000) refresh();
+  });
+  function paint() { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }
+
+  function sorted() {
+    const a = items.slice();
+    if (sort === "desc") a.sort((x, y) => (y.value ?? -1) - (x.value ?? -1));
+    else if (sort === "asc") a.sort((x, y) => (x.value ?? Infinity) - (y.value ?? Infinity));
+    return a;
+  }
+  const sortLabel = () => ({ desc: "Сначала большие", asc: "Сначала малые", none: "Как в списке" }[sort]);
+
+  function card(it) {
+    let right;
+    if (it.status === "ok") {
+      const cls = it.pct == null ? "flat" : it.pct > 0.005 ? "up" : it.pct < -0.005 ? "down" : "flat";
+      const sign = it.pct > 0 ? "+" : "";
+      right = `<div class="bal">${fmtUsd(it.value)}</div><div class="chg ${cls}">${it.pct == null ? "—" : sign + it.pct.toFixed(2) + "%"}</div>`;
+    } else if (it.status === "error") {
+      right = `<div class="err">Не ответил<button data-retry="${it.idx}">Повторить</button></div>`;
+    } else {
+      right = `<span class="sk" style="width:90px;margin-left:auto"></span><span class="sk" style="width:50px;margin:8px 0 0 auto"></span>`;
+    }
+    return `<div class="w">${avatar(it.address)}
+      <div class="info"><div class="name">${esc(it.name)}</div>
+      <button class="addr" data-copy="${it.address}" title="Скопировать адрес">${short(it.address)}${ico.copy}</button></div>
+      <div class="val">${right}</div></div>`;
+  }
+
+  function draw() {
+    if (!root || !root.isConnected) return;
+    const ok = items.filter(i => i.status === "ok"), bad = items.filter(i => i.status === "error");
+    const total = ok.reduce((s, i) => s + i.value, 0);
+    const diff = ok.reduce((s, i) => s + (i.diff || 0), 0);
+    const base = total - diff, pct = base > 0 ? diff / base * 100 : null;
+    const cls = pct == null ? "flat" : pct >= 0 ? "up" : "down";
+    $("#w-total", root).innerHTML = ok.length
+      ? `<small>Общий баланс</small><div class="sum">${fmtUsd(total)}</div>
+         <div class="row"><span class="${cls}">${pct == null ? "—" : (diff >= 0 ? "+" : "−") + fmtUsd(Math.abs(diff)).replace("-", "") + " · " + (pct >= 0 ? "+" : "") + pct.toFixed(2) + "%"} за 24ч</span><span>Загружено ${ok.length} из ${items.length}</span></div>`
+      : `<small>Общий баланс</small><div class="sum"><span class="sk" style="width:200px;height:34px"></span></div><div class="row"><span>Загружаем кошельки…</span></div>`;
+    $("#w-banner", root).innerHTML = bad.length && !loading
+      ? `<div class="banner">Не удалось загрузить кошельков: ${bad.length}. Остальные показаны, итог посчитан без них.</div>` : "";
+    const rb = $("#w-refresh", root);
+    rb.disabled = loading; rb.classList.toggle("spin", loading);
+    $("#w-sort span", root).textContent = sortLabel();
+    $("#w-upd", root).textContent = updated ? "Обновлено в " + updated.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "";
+    $("#w-list", root).innerHTML = sorted().map(card).join("");
+  }
+
+  return {
+    render(el) {
+      root = el;
+      el.innerHTML = `
+        <div class="head"><h1>Wallets</h1></div>
+        <div class="total" id="w-total"></div>
+        <div id="w-banner"></div>
+        <div class="bar">
+          <button class="btn primary" id="w-refresh">${ico.refresh}<span>Обновить</span></button>
+          <button class="btn" id="w-sort">${ico.sort}<span></span></button>
+          <span class="upd" id="w-upd"></span>
+        </div>
+        <div class="list" id="w-list"></div>`;
+      $("#w-refresh", el).onclick = refresh;
+      $("#w-sort", el).onclick = () => { sort = { desc: "asc", asc: "none", none: "desc" }[sort]; draw(); };
+      el.onclick = e => {
+        const c = e.target.closest("[data-copy]"), r = e.target.closest("[data-retry]");
+        if (c) navigator.clipboard?.writeText(c.dataset.copy).then(() => {
+          const t = c.innerHTML; c.textContent = "Скопировано"; setTimeout(() => c.innerHTML = t, 900);
+        });
+        if (r) loadOne(items[+r.dataset.retry]).then(() => { updated = new Date(); paint(); });
+      };
+      draw();
+      if (!updated && !loading) refresh();
+    },
+  };
+})();
+
+/* ============ Реестр модулей ============
+   Чтобы добавить раздел: допишите объект в MODULES.
+   render(container) — отрисовывает содержимое; без render показывается заглушка «Скоро». */
+const MODULES = [
+  { id: "wallets", title: "Wallets", icon: ico.wallet, render: el => Wallets.render(el) },
+  { id: "stats", title: "Статистика", icon: ico.chart },
+  { id: "protocols", title: "Протоколы", icon: ico.globe },
+];
+
+/* ============ Роутер ============ */
+const nav = $("#nav"), view = $("#view");
+nav.innerHTML = MODULES.map(m =>
+  `<button data-id="${m.id}">${m.icon}<span>${esc(m.title)}</span>${m.render ? "" : '<em class="soon" style="font-style:normal">Скоро</em>'}</button>`).join("");
+nav.onclick = e => { const b = e.target.closest("button"); if (b) location.hash = b.dataset.id; };
+
+function route() {
+  const m = MODULES.find(x => x.id === location.hash.slice(1)) || MODULES[0];
+  nav.querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.id === m.id));
+  document.title = m.title + " · Dashboard";
+  if (m.render) m.render(view);
+  else view.innerHTML = `<div class="stub">${ico.clock}<h2>${esc(m.title)}</h2><p>Этот раздел скоро появится.</p></div>`;
+}
+addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
