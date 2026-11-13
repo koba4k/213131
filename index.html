@@ -78,6 +78,15 @@ h1{font-size:22px;font-weight:650;letter-spacing:-.02em}
 .sk{display:block;height:12px;border-radius:6px;background:linear-gradient(90deg,var(--line),#343b50,var(--line));background-size:200% 100%;animation:sh 1.2s linear infinite}
 @keyframes sh{to{background-position:-200% 0}}
 
+.w{flex-wrap:wrap;cursor:pointer}
+.w .chev{width:16px;height:16px;margin-left:10px;color:var(--mute);transition:transform .15s}
+.w.open .chev{transform:rotate(180deg)}
+.w .val{display:flex;align-items:center}
+.w .vv{text-align:right}
+.det{flex-basis:100%;border-top:1px solid var(--line);margin-top:4px;padding-top:10px;display:grid;gap:6px;font-size:13px;color:var(--mute);cursor:default}
+.det .r{display:flex;justify-content:space-between;gap:12px}
+.det .r b{color:var(--text);font-weight:550;font-variant-numeric:tabular-nums}
+.det .sep{height:1px;background:var(--line);margin:2px 0}
 .stub{text-align:center;padding:80px 20px;color:var(--mute)}
 .stub svg{width:40px;height:40px;margin-bottom:12px;opacity:.6}
 .stub h2{color:var(--text);font-size:18px;margin-bottom:6px}
@@ -155,6 +164,7 @@ const ico = {
   refresh: '<svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>',
   sort: '<svg viewBox="0 0 24 24"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/></svg>',
   copy: '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>',
+  chev: '<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>',
   clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
 };
 
@@ -180,27 +190,80 @@ async function post(body, tries = 3) {
   throw new Error("Лимит запросов API");
 }
 
-async function fetchWallet(address) {
-  const [st, pf] = await Promise.allSettled([
-    post({ type: "clearinghouseState", user: address }),
-    post({ type: "portfolio", user: address }),
+// Цены спот-токенов в USD: берём пары с котировкой в USDC (токен №0)
+async function loadPrices() {
+  const [meta, mids] = await Promise.all([post({ type: "spotMeta" }), post({ type: "allMids" })]);
+  const price = { 0: 1 }, byName = {};
+  meta.tokens.forEach(t => byName[t.name] = t.index);
+  for (const u of meta.universe) {
+    if (u.tokens[1] !== 0) continue;
+    const p = parseFloat(mids[u.name]);
+    if (p && (price[u.tokens[0]] === undefined || u.isCanonical)) price[u.tokens[0]] = p;
+  }
+  return { price, byName };
+}
+
+/* Баланс кошелька = всё, что лежит на Hyperliquid:
+   perps + spot (по текущим ценам) + хранилища (vaults) + стейкинг HYPE.
+   Unified / Portfolio margin: все балансы живут в spot-аккаунте, поэтому
+   вместо accountValue перпов добавляем только нереализованный PnL позиций. */
+async function fetchWallet(address, px) {
+  const u = { user: address };
+  const [st, sp, ab, vl, dl, pf] = await Promise.allSettled([
+    post({ type: "clearinghouseState", ...u }),
+    post({ type: "spotClearinghouseState", ...u }),
+    post({ type: "userAbstraction", ...u }),
+    post({ type: "userVaultEquities", ...u }),
+    post({ type: "delegatorSummary", ...u }),
+    post({ type: "portfolio", ...u }),
   ]);
-  if (st.status === "rejected") throw st.reason;
-  let value = parseFloat(st.value?.marginSummary?.accountValue);
+  for (const r of [st, sp, ab]) if (r.status === "rejected") throw r.reason;
+
+  const mode = typeof ab.value === "string" ? ab.value : "default";
+  const unified = mode === "unifiedAccount" || mode === "portfolioMargin";
+
+  const tokens = []; let spotUsd = 0;
+  for (const b of sp.value?.balances || []) {
+    const total = parseFloat(b.total);
+    if (!total) continue;
+    const pr = px.price[b.token], usd = pr ? total * pr : 0;
+    spotUsd += usd; tokens.push({ coin: b.coin, total, usd, noPrice: !pr });
+  }
+  tokens.sort((x, y) => y.usd - x.usd);
+
+  const perpsAcc = parseFloat(st.value?.marginSummary?.accountValue) || 0;
+  const upnl = (st.value?.assetPositions || []).reduce((s, a) => s + (parseFloat(a.position?.unrealizedPnl) || 0), 0);
+  const perps = unified ? upnl : perpsAcc;
+
+  const vaults = vl.status === "fulfilled" && Array.isArray(vl.value)
+    ? vl.value.reduce((s, v) => s + (parseFloat(v.equity) || 0), 0) : 0;
+
+  let staking = 0;
+  if (dl.status === "fulfilled" && dl.value) {
+    const hype = (parseFloat(dl.value.delegated) || 0) + (parseFloat(dl.value.undelegated) || 0) + (parseFloat(dl.value.totalPendingWithdrawal) || 0);
+    staking = hype * (px.price[px.byName.HYPE] || 0);
+  }
+
+  const parts = [
+    { label: unified ? "Perps (PnL позиций)" : "Perps", value: perps },
+    { label: "Spot", value: spotUsd },
+    { label: "Vaults", value: vaults },
+    { label: "Стейкинг HYPE", value: staking },
+  ];
+  const value = parts.reduce((s, x) => s + x.value, 0);
+
+  // Изменение за 24ч: PnL за период «day» / баланс на начало периода
   let diff = null, pct = null;
   if (pf.status === "fulfilled") {
-    const day = (pf.value || []).find(p => p[0] === "day")?.[1];
+    const day = (pf.value || []).find(x => x[0] === "day")?.[1];
     const av = day?.accountValueHistory, pnl = day?.pnlHistory;
     if (av?.length) {
       const start = +av[0][1], end = +av[av.length - 1][1];
-      if (isNaN(value)) value = end;
-      // PnL-разница не учитывает вводы/выводы; если её нет — берём изменение баланса
       diff = pnl?.length > 1 ? +pnl[pnl.length - 1][1] - +pnl[0][1] : end - start;
       pct = start > 0 ? diff / start * 100 : null;
     }
   }
-  if (isNaN(value)) throw new Error("Нет данных");
-  return { value, diff, pct };
+  return { value, diff, pct, mode, parts, tokens };
 }
 
 /* ============ Модуль «Wallets» ============ */
@@ -209,11 +272,17 @@ const Wallets = (() => {
     const o = typeof w === "string" ? { address: w } : w;
     return { address: o.address, name: o.name || "Wallet " + (i + 1), idx: i, status: "idle" };
   });
-  let sort = "desc", loading = false, updated = null, root = null, raf = 0;
+  const open = new Set();
+  const MODES = { default: "Standard", disabled: "Standard", dexAbstraction: "Standard", unifiedAccount: "Unified", portfolioMargin: "Portfolio margin" };
+  const NOPX = { price: { 0: 1 }, byName: {} };
+  let sort = "desc", loading = false, updated = null, root = null, raf = 0, px = null, pxOk = true;
 
+  async function getPrices() {
+    try { px = await loadPrices(); pxOk = true; } catch (e) { px = px || NOPX; pxOk = false; }
+  }
   async function loadOne(it) {
     it.status = "loading"; paint();
-    try { Object.assign(it, await fetchWallet(it.address), { status: "ok", error: null }); }
+    try { Object.assign(it, await fetchWallet(it.address, px || NOPX), { status: "ok", error: null }); }
     catch (e) { it.status = "error"; it.error = e.message || "Ошибка"; }
     paint();
   }
@@ -221,6 +290,7 @@ const Wallets = (() => {
     if (loading) return;
     loading = true; items.forEach(i => { if (i.status !== "ok") i.status = "loading"; });
     paint();
+    await getPrices();
     const queue = items.slice();
     await Promise.all(Array.from({ length: CONCURRENCY }, async () => {
       while (queue.length) await loadOne(queue.shift());
@@ -239,22 +309,34 @@ const Wallets = (() => {
     return a;
   }
   const sortLabel = () => ({ desc: "Сначала большие", asc: "Сначала малые", none: "Как в списке" }[sort]);
+  const num = new Intl.NumberFormat("en-US", { maximumFractionDigits: 4 });
+
+  function details(it) {
+    const rows = it.parts.filter(x => Math.abs(x.value) >= 0.005)
+      .map(x => `<div class="r"><span>${x.label}</span><b>${fmtUsd(x.value)}</b></div>`).join("");
+    const toks = it.tokens.filter(t => t.usd >= 0.01 || t.noPrice).slice(0, 8)
+      .map(t => `<div class="r"><span>${esc(t.coin)} · ${num.format(t.total)}</span><b>${t.noPrice ? "нет цены" : fmtUsd(t.usd)}</b></div>`).join("");
+    return `<div class="det">${rows || '<div class="r"><span>На аккаунте пусто</span></div>'}
+      ${toks ? '<div class="sep"></div>' + toks : ""}
+      <div class="sep"></div><div class="r"><span>Режим аккаунта</span><b>${MODES[it.mode] || esc(it.mode)}</b></div></div>`;
+  }
 
   function card(it) {
+    const isOpen = open.has(it.idx) && it.status === "ok";
     let right;
     if (it.status === "ok") {
       const cls = it.pct == null ? "flat" : it.pct > 0.005 ? "up" : it.pct < -0.005 ? "down" : "flat";
       const sign = it.pct > 0 ? "+" : "";
-      right = `<div class="bal">${fmtUsd(it.value)}</div><div class="chg ${cls}">${it.pct == null ? "—" : sign + it.pct.toFixed(2) + "%"}</div>`;
+      right = `<div class="vv"><div class="bal">${fmtUsd(it.value)}</div><div class="chg ${cls}">${it.pct == null ? "—" : sign + it.pct.toFixed(2) + "%"}</div></div>${ico.chev.replace("<svg", '<svg class="chev"')}`;
     } else if (it.status === "error") {
       right = `<div class="err">Не ответил<button data-retry="${it.idx}">Повторить</button></div>`;
     } else {
-      right = `<span class="sk" style="width:90px;margin-left:auto"></span><span class="sk" style="width:50px;margin:8px 0 0 auto"></span>`;
+      right = `<div class="vv"><span class="sk" style="width:90px;margin-left:auto"></span><span class="sk" style="width:50px;margin:8px 0 0 auto"></span></div>`;
     }
-    return `<div class="w">${avatar(it.address)}
+    return `<div class="w${isOpen ? " open" : ""}" ${it.status === "ok" ? `data-toggle="${it.idx}" tabindex="0" role="button" aria-expanded="${isOpen}"` : ""}>${avatar(it.address)}
       <div class="info"><div class="name">${esc(it.name)}</div>
       <button class="addr" data-copy="${it.address}" title="Скопировать адрес">${short(it.address)}${ico.copy}</button></div>
-      <div class="val">${right}</div></div>`;
+      <div class="val">${right}</div>${isOpen ? details(it) : ""}</div>`;
   }
 
   function draw() {
@@ -265,17 +347,20 @@ const Wallets = (() => {
     const base = total - diff, pct = base > 0 ? diff / base * 100 : null;
     const cls = pct == null ? "flat" : pct >= 0 ? "up" : "down";
     $("#w-total", root).innerHTML = ok.length
-      ? `<small>Общий баланс</small><div class="sum">${fmtUsd(total)}</div>
-         <div class="row"><span class="${cls}">${pct == null ? "—" : (diff >= 0 ? "+" : "−") + fmtUsd(Math.abs(diff)).replace("-", "") + " · " + (pct >= 0 ? "+" : "") + pct.toFixed(2) + "%"} за 24ч</span><span>Загружено ${ok.length} из ${items.length}</span></div>`
-      : `<small>Общий баланс</small><div class="sum"><span class="sk" style="width:200px;height:34px"></span></div><div class="row"><span>Загружаем кошельки…</span></div>`;
-    $("#w-banner", root).innerHTML = bad.length && !loading
-      ? `<div class="banner">Не удалось загрузить кошельков: ${bad.length}. Остальные показаны, итог посчитан без них.</div>` : "";
+      ? `<small>Общий баланс на Hyperliquid</small><div class="sum">${fmtUsd(total)}</div>
+         <div class="row"><span class="${cls}">${pct == null ? "—" : (diff >= 0 ? "+" : "−") + fmtUsd(Math.abs(diff)) + " · " + (pct >= 0 ? "+" : "") + pct.toFixed(2) + "%"} за 24ч</span><span>Загружено ${ok.length} из ${items.length}</span></div>`
+      : `<small>Общий баланс на Hyperliquid</small><div class="sum"><span class="sk" style="width:200px;height:34px"></span></div><div class="row"><span>Загружаем кошельки…</span></div>`;
+    $("#w-banner", root).innerHTML =
+      (bad.length && !loading ? `<div class="banner">Не удалось загрузить кошельков: ${bad.length}. Остальные показаны, итог посчитан без них.</div>` : "") +
+      (!pxOk && !loading ? `<div class="banner">Не удалось получить цены токенов: спот-токены кроме USDC не учтены в сумме.</div>` : "");
     const rb = $("#w-refresh", root);
     rb.disabled = loading; rb.classList.toggle("spin", loading);
     $("#w-sort span", root).textContent = sortLabel();
     $("#w-upd", root).textContent = updated ? "Обновлено в " + updated.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "";
     $("#w-list", root).innerHTML = sorted().map(card).join("");
   }
+
+  function toggle(i) { open.has(i) ? open.delete(i) : open.add(i); draw(); }
 
   return {
     render(el) {
@@ -294,10 +379,19 @@ const Wallets = (() => {
       $("#w-sort", el).onclick = () => { sort = { desc: "asc", asc: "none", none: "desc" }[sort]; draw(); };
       el.onclick = e => {
         const c = e.target.closest("[data-copy]"), r = e.target.closest("[data-retry]");
-        if (c) navigator.clipboard?.writeText(c.dataset.copy).then(() => {
-          const t = c.innerHTML; c.textContent = "Скопировано"; setTimeout(() => c.innerHTML = t, 900);
-        });
-        if (r) loadOne(items[+r.dataset.retry]).then(() => { updated = new Date(); paint(); });
+        if (c) {
+          navigator.clipboard?.writeText(c.dataset.copy).then(() => {
+            const t = c.innerHTML; c.textContent = "Скопировано"; setTimeout(() => c.innerHTML = t, 900);
+          });
+          return;
+        }
+        if (r) { (px ? Promise.resolve() : getPrices()).then(() => loadOne(items[+r.dataset.retry])).then(() => { updated = new Date(); paint(); }); return; }
+        const w = e.target.closest("[data-toggle]");
+        if (w && !e.target.closest(".det")) toggle(+w.dataset.toggle);
+      };
+      el.onkeydown = e => {
+        const w = e.target.closest?.("[data-toggle]");
+        if (w && w === e.target && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); toggle(+w.dataset.toggle); }
       };
       draw();
       if (!updated && !loading) refresh();
